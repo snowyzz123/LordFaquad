@@ -10,12 +10,16 @@ import java.util.List;
 
 public class MainServer {
 	// TODO add timer + hashmap shit
-
+	
+	public static final String SERVER_HOST = "35.239.122.216";
+	public static final int SERVER_PORT = 8080;
+	
     public static final int BEEF_BEEF = 0xbeefBeef;
     public static final int DEAD_DEAD = 0xdeadDead;
     public static final String BEERI_IP_HOME_PC = "147.235.212.60";
     public static final String BEERI_IP_UNI = "172.30.103.105";
     public static final String OMER_IP_UNI = "172.30.96.77";
+    public static boolean needSend = false;
     
     public static void log(String fmt, Object... args) {
         println(fmt, args);
@@ -218,7 +222,28 @@ public class MainServer {
             }
             // TODO(students): sendRequest data of blocks
         }
+        
+        public static void sleepThread() throws InterruptedException {
+        	Thread.sleep(300000);
+        	needSend = true;
+        }
+        
+        public static void sendRecieveThread(ClientConnection connection) {
+        	if(needSend = true) {
+        		connection.sendReceive();
+        		needSend = false;
+        	}
+        }
+        
+        public static void mineThread(ArrayList<Block> blocks) {
+        	Block block = HanukCoinUtils.mineCoinAtteempt(200430326, blocks.getLast(), 100000);
+        	if(block != null) {
+        		blocks.add(block);
+        		needSend = true;
+        	}
+        }
     }
+
 
 
     public static void sendReceive(String host, int port){
@@ -241,7 +266,15 @@ public class MainServer {
         String[] parts = argv[0].split(":");
         String addr = parts[0];
         int port = Integer.parseInt(parts[1]);
-        sendReceive(addr, port);
+        try {
+            log("INFO - Sending request message to %s:%d", addr, port);
+            Socket soc = new Socket(addr, port);
+            ClientConnection connection = new ClientConnection(soc);
+        } catch (IOException e) {
+            log("WARN - open socket exception connecting to %s:%d: %s", addr, port, e.toString());
+        }
+        
+        // TODO add threads to this for each thread function
 	}
 
 }
