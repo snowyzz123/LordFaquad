@@ -114,10 +114,8 @@ public class MainServer {
         public void sendReceive() {
             try {
             	initClients();
-                for(OtherClient client : otherClients) {
-                    sendRequest(1, client.dataOutput);
-                    parseMessage(client.dataInput, client.dataOutput);
-                }
+                sendRequest(1, dataOutput);
+                parseMessage(dataInput, dataOutput);
                 
 
             } catch (IOException e) {
