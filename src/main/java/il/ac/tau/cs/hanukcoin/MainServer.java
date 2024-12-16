@@ -215,6 +215,9 @@ public class MainServer {
             dos.writeInt(DEAD_DEAD);
             int blockChain_size = 0;
             dos.writeInt(blockChain_size);
+            for(Block block : blocks) {
+            	dos.write(block.data);
+            }
             // TODO(students): sendRequest data of blocks
         }
     }
