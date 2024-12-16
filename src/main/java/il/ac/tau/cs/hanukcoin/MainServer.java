@@ -13,7 +13,9 @@ public class MainServer {
 
     public static final int BEEF_BEEF = 0xbeefBeef;
     public static final int DEAD_DEAD = 0xdeadDead;
-    public static final String BEERI_IP_HOME = "147.235.212.60";
+    public static final String BEERI_IP_HOME_PC = "147.235.212.60";
+    public static final String BEERI_IP_UNI = "172.30.103.105";
+    public static final String OMER_IP_UNI = "172.30.96.77";
     
     public static void log(String fmt, Object... args) {
         println(fmt, args);
@@ -93,7 +95,7 @@ public class MainServer {
                throw new RuntimeException("FATAL = cannot create data streams", e);
             }
             self.name = "LordFarquad";
-            self.host = BEERI_IP_HOME;
+            self.host = BEERI_IP_UNI;
             self.port = 8088;
             self.lastSeenTS = (int)(System.currentTimeMillis() / 1000);
             
