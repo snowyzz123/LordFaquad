@@ -181,10 +181,8 @@ public class MainServer {
                 Block newBlock = Block.readFrom(dataInput);
                 receivedBlocks.add(newBlock);
             }
-            if(receivedBlocks.size() >= blocks.size()) {
-            	nodes = receivedNodes;
-            	blocks = receivedBlocks;
-            }
+            nodes = receivedNodes;
+           	blocks = receivedBlocks;
             
             printMessage(receivedNodes, receivedBlocks);
             
@@ -217,7 +215,7 @@ public class MainServer {
             }*/
             // TODO(students): sendRequest data of active (not new) nodes
             dos.writeInt(DEAD_DEAD);
-            int blockChain_size = 0;
+            int blockChain_size = blocks.size();
             dos.writeInt(blockChain_size);
             for(Block block : blocks) {
             	dos.write(block.data);
@@ -226,23 +224,30 @@ public class MainServer {
         }
         
         public static void sleepThread() throws InterruptedException {
-        	Thread.sleep(300000);
-        	needSend = true;
+        	while(true) {
+	        	Thread.sleep(300000);
+	        	needSend = true;
+        	}
         }
         
         public static void sendRecieveThread(ClientConnection connection) {
-        	if(needSend = true) {
-        		connection.sendReceive();
-        		needSend = false;
+        	while(true) {
+	        	if(needSend = true) {
+	        		connection.sendReceive();
+	        		needSend = false;
+	        	}
         	}
         }
         
         public static void mineThread(ArrayList<Block> blocks) {
-        	Block block = HanukCoinUtils.mineCoinAtteempt(200430326, blocks.getLast(), 100000);
-        	if(block != null) {
-        		System.out.println("New block: " + block.data);
-        		blocks.add(block);
-        		needSend = true;
+        	while(true) {
+	        	System.out.println("Trying to mine");
+	        	Block block = HanukCoinUtils.mineCoinAtteempt(200430326, blocks.getLast(), 100000);
+	        	if(block != null) {
+	        		System.out.println("New block: " + block.data);
+	        		blocks.add(block);
+	        		needSend = true;
+	        	}
         	}
         }
     }
@@ -284,11 +289,15 @@ public class MainServer {
 //				}
 //			}).start();
             connection.sendReceive();
+            Block last = connection.blocks.getLast();
+            System.out.println(last.data);
             while(true) {
-            	if(needSend) {
+            	Block block = HanukCoinUtils.mineCoinAtteempt(200430326, connection.blocks.getLast(), 100000);
+            	if(block != null) {
+                	System.out.println(block.data);
+                	connection.blocks.add(block);
             		connection.sendReceive();
             	}
-            	ClientConnection.mineThread(connection.blocks);
             }
         } catch (IOException e) {
             log("WARN - open socket exception connecting to %s:%d: %s", addr, port, e.toString());
