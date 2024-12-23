@@ -89,6 +89,7 @@ public class MainServer {
         
         
         public ClientConnection(Socket connectionSocket) {
+        	blocks.add(HanukCoinUtils.createBlock0forTestStage());
             try {
                 dataInput = new DataInputStream(connectionSocket.getInputStream());
                 dataOutput = new DataOutputStream(connectionSocket.getOutputStream());
@@ -205,14 +206,15 @@ public class MainServer {
         	
             dos.writeInt(cmd);
             dos.writeInt(BEEF_BEEF);
-            int activeNodes = nodes.size();
+            int activeNodes = 0; //nodes.size();
             // TODO(students): calculate number of active (not new) nodes
             dos.writeInt(activeNodes);
+            /*
             for(NodeInfo node : nodes) {
             	byte[] bytes = nodeBuilder(node);
             	dos.write(bytes);
 
-            }
+            }*/
             // TODO(students): sendRequest data of active (not new) nodes
             dos.writeInt(DEAD_DEAD);
             int blockChain_size = 0;
@@ -238,6 +240,7 @@ public class MainServer {
         public static void mineThread(ArrayList<Block> blocks) {
         	Block block = HanukCoinUtils.mineCoinAtteempt(200430326, blocks.getLast(), 100000);
         	if(block != null) {
+        		System.out.println("New block: " + block.data);
         		blocks.add(block);
         		needSend = true;
         	}
@@ -270,11 +273,29 @@ public class MainServer {
             log("INFO - Sending request message to %s:%d", addr, port);
             Socket soc = new Socket(addr, port);
             ClientConnection connection = new ClientConnection(soc);
+//            new Thread(() -> ClientConnection.sendRecieveThread(connection)).start();
+//            new Thread(() -> ClientConnection.mineThread(connection.blocks)).start();
+//            new Thread(() -> {
+//				try {
+//					ClientConnection.sleepThread();
+//				} catch (InterruptedException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}).start();
+            connection.sendReceive();
+            while(true) {
+            	if(needSend) {
+            		connection.sendReceive();
+            	}
+            	ClientConnection.mineThread(connection.blocks);
+            }
         } catch (IOException e) {
             log("WARN - open socket exception connecting to %s:%d: %s", addr, port, e.toString());
         }
         
         // TODO add threads to this for each thread function
+        
 	}
 
 }
